@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
+
+import cd from './data/comics.json';
+interface ComicSchema {
+  [index:string] : {title: string, hover: string}
+}
+const comicData: ComicSchema = cd;
 
 import styles from './App.css';
 
 export default function App() {
-  const [count, setCount] = useState(0);
+  const [comicId, setComicId] = useState(1);
+  const key = `${comicId}`;
+  if (!(key in comicData)) {
+    return '404';
+  }
+
+  const {title, hover} = comicData[key];
   return (
     <div className={styles.container}>
-      <h2>React minimal starter kit</h2>
-      <p>
-        This is a simple starter kit to help you bootstrap your React project
-        with few frills.
-      </p>
-      <button type="button" onClick={() => setCount(count + 1)}>
-        Increase cat count: {count}
+      <Helmet>
+        <title>{`${title} || Nameless Comic` }</title>
+      </Helmet>
+      <h2>{title}</h2>
+      <img 
+        src={`images/comics/${comicId}.jpg`}
+        alt={hover}
+        title={hover}
+      />
+      <button type="button" onClick={() => setComicId(comicId + 1)}>
+        Next comic: {comicId}
       </button>
-      <CatCounter count={count} />
+      <CatCounter count={comicId} />
     </div>
   );
 }
