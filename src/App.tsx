@@ -18,21 +18,29 @@ export default function App() {
 
   const {title, hover} = comicData[key];
   return (
-    <div className={styles.container}>
+    <>
       <Helmet>
         <title>{`${title} || Nameless Comic` }</title>
       </Helmet>
-      <h2>{title}</h2>
-      <img 
-        src={`images/comics/${comicId}.jpg`}
-        alt={hover}
-        title={hover}
-      />
-      <button type="button" onClick={() => setComicId(comicId + 1)}>
-        Next comic: {comicId}
-      </button>
-      <CatCounter count={comicId} />
-    </div>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          First 
+          Previous
+          Random 
+          Next 
+          Last
+        </div>
+        <img 
+          src={`images/comics/${comicId}.jpg`}
+          alt={hover}
+          title={hover}
+        />
+        <button type="button" onClick={() => setComicId(comicId + 1)}>
+          Next comic: {comicId}
+        </button>
+        <CatCounter count={comicId} />
+      </div>
+    </>
   );
 }
 
