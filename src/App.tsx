@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet';
+import {
+  useRouteMatch,
+  Link
+} from "react-router-dom";
 
 import cd from './data/comics.json';
 interface ComicSchema {
@@ -9,49 +13,65 @@ const comicData: ComicSchema = cd;
 
 import styles from './App.css';
 
+const lastComic = Object.keys(comicData).length;
+
+function randomInt(max: number): number {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 export default function App() {
-  const [comicId, setComicId] = useState(1);
-  const key = `${comicId}`;
-  if (!(key in comicData)) {
-    return '404';
+  const match = useRouteMatch('/:comicId');
+
+  const comicId = Number.parseInt(match?.params?.comicId) || lastComic; 
+
+  if (!(comicId in comicData)) {
+    return <div className={styles.container}>404</div>;
   }
 
-  const {title, hover} = comicData[key];
+  const {title} = comicData[comicId];
+
   return (
     <>
       <Helmet>
         <title>{`${title} || Nameless Comic` }</title>
       </Helmet>
       <div className={styles.container}>
-        <div className={styles.header}>
-          First 
-          Previous
-          Random 
-          Next 
-          Last
-        </div>
-        <img 
-          src={`images/comics/${comicId}.jpg`}
-          alt={hover}
-          title={hover}
-        />
-        <button type="button" onClick={() => setComicId(comicId + 1)}>
-          Next comic: {comicId}
-        </button>
-        <CatCounter count={comicId} />
+        <ComicView comicId={comicId} />
       </div>
     </>
   );
 }
 
-function CatCounter({count}: {count: number}) {
-  let cats: Array<String> = [];
-  for (let i = 0; i < count; i++) {
-    cats.push('🐱');
-  }
+function ComicView({comicId}: {comicId: number}) {
+  const key = `${comicId}`;
+
+  const {hover} = comicData[key];
+  
+  const random = randomInt(lastComic) + 1;
   return (
     <>
-      {cats}
+      <div className={styles.header}>
+        <Link to="1">
+          First 
+        </Link>
+        <Link to={`/${comicId - 1}`}>
+          Previous
+        </Link>
+        <Link to={`/${random}`}>
+          Random 
+        </Link>
+        <Link to={`/${comicId + 1}`}>
+          Next
+        </Link>
+        <Link to={`/${lastComic}`}>
+          Last
+        </Link>
+      </div>
+      <img 
+        src={`images/comics/${comicId}.jpg`}
+        alt={hover}
+        title={hover}
+      />
     </>
   );
 }

@@ -8,6 +8,7 @@ const config = {
   context: path.join(__dirname, 'src'),
   entry: ['./main.ts'],
   devServer: {
+    historyApiFallback: true,
     contentBase: path.join(__dirname, 'public'),
     publicPath: '/build',
     hot: true,
