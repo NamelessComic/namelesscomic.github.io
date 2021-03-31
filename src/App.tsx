@@ -11,7 +11,7 @@ interface ComicSchema {
 }
 const comicData: ComicSchema = cd;
 
-import styles from './App.css';
+import ScrollToTop from './ScrollToTop';
 
 const lastComic = Object.keys(comicData).length;
 
@@ -25,46 +25,59 @@ export default function App() {
   const comicId = Number.parseInt(match?.params?.comicId) || lastComic; 
 
   if (!(comicId in comicData)) {
-    return <div className={styles.container}>404</div>;
+    return '404';
   }
 
   const {title} = comicData[comicId];
 
   return (
     <>
+      <ScrollToTop />
       <Helmet>
         <title>{`${title} || Nameless Comic` }</title>
       </Helmet>
-      <div className={styles.container}>
-        <ComicView comicId={comicId} />
-      </div>
+      <ComicView comicId={comicId} />
     </>
   );
 }
 
 function ComicView({comicId}: {comicId: number}) {
   const key = `${comicId}`;
-
   const {hover} = comicData[key];
-  
   const random = randomInt(lastComic) + 1;
+
+  const isFirst = comicId === 1;
+  const isLast = comicId === lastComic;
+
   return (
     <>
-      <div className={styles.header}>
-        <Link to="1">
-          First 
+      <div className="header">
+        <Link 
+          to="1" 
+          className={isFirst ? 'disabled' : ''}
+        >
+          « First
         </Link>
-        <Link to={`/${comicId - 1}`}>
-          Previous
+        <Link 
+          to={`/${Math.max(comicId - 1, 0)}`}
+          className={isFirst ? 'disabled' : ''}
+        >
+          ← Previous
         </Link>
         <Link to={`/${random}`}>
-          Random 
+          Random
         </Link>
-        <Link to={`/${comicId + 1}`}>
-          Next
+        <Link 
+          to={`/${Math.min(comicId + 1, lastComic)}`}
+          className={isLast ? 'disabled' : ''}
+        >
+          Next →
         </Link>
-        <Link to={`/${lastComic}`}>
-          Last
+        <Link 
+          to={`/${lastComic}`}
+          className={isLast ? 'disabled' : ''}
+        >
+          Last »
         </Link>
       </div>
       <img 

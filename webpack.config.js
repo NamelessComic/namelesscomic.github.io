@@ -1,6 +1,35 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const comicData = require('./src/data/comics.json');
+
+const lastComic = Object.keys(comicData).length;
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
+const comicPageGenerators = [];
+
+function randomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+for (let i = 0; i <= lastComic; i++) {
+  const comicId = i || lastComic;
+  const filename = `${i || 'index'}.html`;
+  const { title, hover } = comicData[`${comicId}`];
+
+  comicPageGenerators.push(new HtmlWebpackPlugin({
+    template: 'templates/index.html',
+    filename,
+    templateParameters: {
+      title,
+      hover,
+      comicId,
+      lastComic,
+      randomId: randomInt(lastComic) + 1,
+    },
+  }));
+}
 
 const config = {
   mode: isDevelopment ? 'development' : 'production',
@@ -8,13 +37,12 @@ const config = {
   context: path.join(__dirname, 'src'),
   entry: ['./main.ts'],
   devServer: {
-    historyApiFallback: true,
-    contentBase: path.join(__dirname, 'public'),
-    publicPath: '/build',
+    contentBase: path.join(__dirname, 'build'),
+    publicPath: '/',
     hot: true,
   },
   output: {
-    path: path.join(__dirname, 'public/build'),
+    path: path.join(__dirname, 'build'),
     filename: 'bundle.min.js',
   },
   module: {
@@ -46,7 +74,14 @@ const config = {
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
-  plugins: [],
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: 'assets', to: '' },
+      ],
+    }),
+    ...comicPageGenerators,
+  ],
 };
 
 module.exports = config;
